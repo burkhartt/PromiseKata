@@ -76,4 +76,71 @@ describe('Testing Promise', () => {
             });
         });
     });
+
+    describe('Non-dynamic Promise chain', () => {
+        let thenFn1;
+        let thenFn2;
+        let thenFn3;
+        let fnCalls;
+
+        beforeEach(() => {
+            thenFn1 = jest.fn();
+            thenFn2 = jest.fn();
+            thenFn3 = jest.fn();
+            fnCalls = [];
+        });
+
+        describe('When all of the Thens are successful', () => {
+            it('Should call each Then function in order', () => {
+                new P((resolve, reject) => resolve())
+                    .then(() => {
+                        fnCalls.push(thenFn1);
+                        thenFn1();
+                    })
+                    .then(() => {
+                        fnCalls.push(thenFn2);
+                        thenFn2();
+                    })
+                    .then(() => {
+                        fnCalls.push(thenFn3);
+                        thenFn3();
+                    })
+                    .catch(catchFn);
+
+                expect(thenFn1).toBeCalled();
+                expect(thenFn2).toBeCalled();
+                expect(thenFn3).toBeCalled();
+                expect(catchFn).not.toBeCalled();
+                expect(fnCalls).toEqual([thenFn1, thenFn2, thenFn3]);
+            });
+        });
+
+        describe('When one of the Thens throws an Error', () => {
+            it('Should call the Then functions before the error and the Catch function', () => {
+                new P((resolve, reject) => resolve())
+                    .then(() => {
+                        fnCalls.push(thenFn1);
+                        thenFn1();
+                    })
+                    .then(() => {
+                        fnCalls.push(thenFn2);
+                        thenFn2();
+                        throw new Error(errorResult);
+                    })
+                    .then(() => {
+                        fnCalls.push(thenFn3);
+                        thenFn3();
+                    })
+                    .catch(() => {
+                        fnCalls.push(catchFn);
+                        catchFn();
+                    });
+
+                expect(thenFn1).toBeCalled();
+                expect(thenFn2).toBeCalled();
+                expect(thenFn3).not.toBeCalled();
+                expect(catchFn).toBeCalled();
+            });
+        });
+    });
 });

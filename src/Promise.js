@@ -33,7 +33,15 @@ class P {
         this._thenCallbacks.push(callback);
 
         if (this._results.length) {
-            this._nextThen()();
+            try {
+                this._nextThen()();
+            } catch (err) {
+                this._errors.push(err);
+                const nc = this._nextCatch();
+                if (nc) {
+                    nc();
+                }
+            }
         }
 
         return this;
