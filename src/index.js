@@ -4,7 +4,7 @@ function doStuff() {
     const promise = new P((resolve, reject) => {
         setTimeout(() => {
             resolve();
-        }, 3000);
+        }, 1);
     });
 
     return promise;

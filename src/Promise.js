@@ -1,13 +1,13 @@
-let results = [];
-let errors = [];
-
-let thenCallbacks = [];
-let errorCallbacks = [];
-
 class P {
     constructor(callback) {
+        this._results = [];
+        this._errors = [];
+
+        this._thenCallbacks = [];
+        this._errorCallbacks = [];
+
         const resolve = (param) => {
-            results.push(param);
+            this._results.push(param);
             const nt = this._nextThen();
             if (nt) {
                 nt();
@@ -15,7 +15,7 @@ class P {
         };
 
         const reject = (param) => {
-            errors.push(param);
+            this._errors.push(param);
             const nc = this._nextCatch();
             if (nc) {
                 nc();
@@ -26,13 +26,13 @@ class P {
     }
 
     get isResolved() {
-        return !thenCallbacks.length && !errorCallbacks.length;
+        return !this._thenCallbacks.length && !this._errorCallbacks.length;
     }
 
     then(callback) {
-        thenCallbacks.push(callback);
+        this._thenCallbacks.push(callback);
 
-        if (results.length) {
+        if (this._results.length) {
             this._nextThen()();
         }
 
@@ -40,23 +40,23 @@ class P {
     }
 
     _nextThen() {
-        if (!thenCallbacks.length) {
+        if (!this._thenCallbacks.length) {
             return;
         }
 
         return () => {
-            const nextResult = results.shift();
-            const nextThen = thenCallbacks.shift();
+            const nextResult = this._results.shift();
+            const nextThen = this._thenCallbacks.shift();
 
             const result = nextThen(nextResult);
-            results.push(result);
+            this._results.push(result);
 
             const r = this._nextThen();
             if (r) {
                 try {
                     r();
                 } catch (err) {
-                    errors.push(err);
+                    this._errors.push(err);
                     this._nextCatch()();
                 }
             }
@@ -64,9 +64,9 @@ class P {
     }
 
     catch(callback) {
-        errorCallbacks.push(callback);
+        this._errorCallbacks.push(callback);
 
-        if (errors.length) {
+        if (this._errors.length) {
             this._nextCatch()();
         }
 
@@ -74,13 +74,13 @@ class P {
     }
 
     _nextCatch() {
-        if (!errorCallbacks.length) {
+        if (!this._errorCallbacks.length) {
             return;
         }
 
         return () => {
-            const nextError = errors.shift();
-            const nextCatch = errorCallbacks.shift();
+            const nextError = this._errors.shift();
+            const nextCatch = this._errorCallbacks.shift();
 
             nextCatch(nextError);
             const r = this._nextCatch();
