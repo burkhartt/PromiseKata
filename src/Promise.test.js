@@ -154,14 +154,14 @@ describe('Testing Promise', () => {
                                 resolve(successResult);
                             }, 1);
                         }))
-                        .then(() => {
+                        .then((result) => {
                             fnCalls.push(thenFn2);
-                            thenFn2();
+                            thenFn2(result);
                         })
                         .then(() => {
                             try {
                                 expect(thenFn1).toBeCalled();
-                                expect(thenFn2).toBeCalled();
+                                expect(thenFn2).toBeCalledWith(successResult);
                                 expect(fnCalls).toEqual([thenFn1, thenFn2]);
                                 done();
                             } catch (ex) {
