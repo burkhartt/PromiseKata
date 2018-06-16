@@ -45,10 +45,10 @@ class P {
         }
 
         return () => {
-            const nextResult = this._results.shift();
+            const resultFromLastPromise = this._results.shift();
             const nextThen = this._thenCallbacks.shift();
 
-            const result = nextThen(nextResult);
+            const result = nextThen(resultFromLastPromise);
 
             if (result instanceof P) {
                 result
