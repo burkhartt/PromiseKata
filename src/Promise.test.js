@@ -47,7 +47,7 @@ describe('Testing Promise', () => {
 
     describe('When wrapping an asynchronous function in a Promise', () => {
         describe('When the promise is successful', () => {
-            it('Should call the Then function with the result fo the synchronous function', (done) => {
+            it('Should call the Then function with the result', (done) => {
                 new P((resolve, reject) => setTimeout(() => {
                     resolve(successResult);
                 }, 1))
@@ -59,8 +59,10 @@ describe('Testing Promise', () => {
                         throw new Error('Error should not have been thrown');
                     });
             });
+        });
 
-            it('Should not call the Catch function', () => {
+        describe('When the promise is unsuccessful', () => {
+            it('Should call the Catch function with the error', () => {
                 new P((resolve, reject) => setTimeout(() => {
                     reject(errorResult);
                 }, 1))
