@@ -28,7 +28,7 @@ class P {
     then(callback) {
         this._thenCallbacks.push(callback);
 
-        if (this._results.length) {
+        if (this._lastPromiseHasResolved) {
             try {
                 this._nextThen()();
             } catch (err) {
@@ -58,6 +58,10 @@ class P {
                 this._handleResult(result);
             }
         };
+    }
+
+    get _lastPromiseHasResolved() {
+        return this._results.length;
     }
 
     _handleResult(result) {
