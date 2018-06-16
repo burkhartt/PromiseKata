@@ -40,7 +40,7 @@ class P {
     }
 
     _nextThen() {
-        if (!this._thenCallbacks.length) {
+        if (!this._nextThenFnExists) {
             return;
         }
 
@@ -62,6 +62,10 @@ class P {
 
     get _lastPromiseHasResolved() {
         return this._results.length;
+    }
+
+    get _nextThenFnExists() {
+        return this._thenCallbacks.length;
     }
 
     _handleResult(result) {
