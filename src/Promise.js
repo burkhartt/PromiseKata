@@ -25,10 +25,6 @@ class P {
         callback(resolve, reject);
     }
 
-    get isResolved() {
-        return !this._thenCallbacks.length && !this._errorCallbacks.length;
-    }
-
     then(callback) {
         this._thenCallbacks.push(callback);
 
@@ -57,18 +53,29 @@ class P {
             const nextThen = this._thenCallbacks.shift();
 
             const result = nextThen(nextResult);
-            this._results.push(result);
 
-            const r = this._nextThen();
-            if (r) {
-                try {
-                    r();
-                } catch (err) {
-                    this._errors.push(err);
-                    this._nextCatch()();
-                }
+            if (result instanceof P) {
+                result.then(() => {
+                    this._handleResult(result);
+                });
+            } else {
+                this._handleResult(result);
             }
         };
+    }
+
+    _handleResult(result) {
+        this._results.push(result);
+
+        const r = this._nextThen();
+        if (r) {
+            try {
+                r();
+            } catch (err) {
+                this._errors.push(err);
+                this._nextCatch()();
+            }
+        }
     }
 
     catch(callback) {
