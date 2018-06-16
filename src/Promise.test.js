@@ -62,7 +62,7 @@ describe('Testing Promise', () => {
         });
 
         describe('When the promise is unsuccessful', () => {
-            it('Should call the Catch function with the error', () => {
+            it('Should call the Catch function with the error', (done) => {
                 new P((resolve, reject) => setTimeout(() => {
                     reject(errorResult);
                 }, 1))
@@ -140,6 +140,33 @@ describe('Testing Promise', () => {
                 expect(thenFn2).toBeCalled();
                 expect(thenFn3).not.toBeCalled();
                 expect(catchFn).toBeCalled();
+            });
+        });
+
+        describe('When a Then function has a new Promise to handle', () => {
+            it('Should call the Then function after the new promise has resolved', (done) => {
+                new P((resolve, reject) => resolve())
+                    .then(() => new P((resolve, reject) => {
+                        setTimeout(() => {
+                            fnCalls.push(thenFn1);
+                            thenFn1();
+                            resolve(successResult);
+                        }, 1);
+                    }))
+                    .then(() => {
+                        fnCalls.push(thenFn2);
+                        thenFn2();
+                    })
+                    .then(() => {
+                        try {
+                            expect(thenFn1).toBeCalled();
+                            expect(thenFn2).toBeCalled();
+                            expect(fnCalls).toEqual([thenFn1, thenFn2]);
+                            done();
+                        } catch (ex) {
+                            done(ex);
+                        }
+                    });
             });
         });
     });
