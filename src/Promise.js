@@ -32,11 +32,7 @@ class P {
             try {
                 this._nextThen()();
             } catch (err) {
-                this._errors.push(err);
-                const nc = this._nextCatch();
-                if (nc) {
-                    nc();
-                }
+                this._handleError(err);
             }
         }
 
@@ -57,6 +53,8 @@ class P {
             if (result instanceof P) {
                 result.then(() => {
                     this._handleResult(result);
+                }).catch((err) => {
+                    this._handleError(err);
                 });
             } else {
                 this._handleResult(result);
@@ -72,9 +70,16 @@ class P {
             try {
                 r();
             } catch (err) {
-                this._errors.push(err);
-                this._nextCatch()();
+                this._handleError(err);
             }
+        }
+    }
+
+    _handleError(err) {
+        this._errors.push(err);
+        const nc = this._nextCatch();
+        if (nc) {
+            nc();
         }
     }
 

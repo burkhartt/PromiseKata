@@ -1,6 +1,6 @@
 const P = require('./Promise');
 
-function doStuff() {
+function asyncFn() {
     const promise = new P((resolve, reject) => {
         setTimeout(() => {
             resolve();
@@ -10,11 +10,7 @@ function doStuff() {
     return promise;
 }
 
-function doThings() {
-
-}
-
-doStuff()
+asyncFn()
     .then(() => {
         console.log('done');
         return 3;
