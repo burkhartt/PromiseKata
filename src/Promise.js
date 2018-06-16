@@ -51,11 +51,9 @@ class P {
             const result = nextThen(nextResult);
 
             if (result instanceof P) {
-                result.then((promiseResult) => {
-                    this._handleResult(promiseResult);
-                }).catch((err) => {
-                    this._handleError(err);
-                });
+                result
+                    .then((r) => this._handleResult(r))
+                    .catch((err) => this._handleError(err));
             } else {
                 this._handleResult(result);
             }
